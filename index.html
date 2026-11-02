@@ -1,0 +1,632 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>allWebservice</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* Layout: a field-index. A large masthead, a sticky filter bar, then the 30 entries grouped under four roman-numbered chapters. */
+:root {
+  --bg: #eceee6;
+  --surface: #f8f9f4;
+  --ink: #1a211d;
+  --muted: #5d6861;
+  --line: #cdd3c9;
+  --grid: rgba(26, 33, 29, 0.055);
+  --accent: #c8432a;
+  --accent-ink: #fff7f3;
+  --font-display: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101412;
+    --surface: #171d1a;
+    --ink: #e7ece7;
+    --muted: #97a39b;
+    --line: #2b342f;
+    --grid: rgba(231, 236, 231, 0.045);
+    --accent: #ff7a52;
+    --accent-ink: #1a0d08;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101412;
+  --surface: #171d1a;
+  --ink: #e7ece7;
+  --muted: #97a39b;
+  --line: #2b342f;
+  --grid: rgba(231, 236, 231, 0.045);
+  --accent: #ff7a52;
+  --accent-ink: #1a0d08;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--bg);
+}
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Masthead */
+.masthead {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  border-bottom: 1px solid var(--ink);
+}
+.mast-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-block: clamp(40px, 8vw, 88px) 40px;
+  display: grid;
+  gap: 22px;
+}
+.kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(48px, 11vw, 112px);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+h1 .dot { color: var(--accent); }
+.lead {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--muted);
+  font-size: 16px;
+  text-wrap: pretty;
+}
+.stats {
+  margin: 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+.stats div {
+  padding: 14px 28px 0 0;
+  margin-right: 28px;
+  border-right: 1px solid var(--line);
+}
+.stats div:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+.stats dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.stats dd { margin: 2px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.byline { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; font-size: 14px; }
+.byline a {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 1px;
+}
+.byline a:hover { color: var(--accent); }
+
+/* Sticky filter bar */
+.toolbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.toolbar-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-block: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+.tab {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.tab:hover { border-color: var(--ink); }
+.tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tab .n { font-family: var(--font-mono); font-size: 11px; opacity: 0.7; margin-left: 4px; }
+.tools { display: flex; gap: 8px; flex: 1 1 260px; max-width: 420px; min-width: 0; }
+.search {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 12px;
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  padding: 9px 0;
+}
+.search input::placeholder { color: var(--muted); }
+.search input:focus { outline: none; }
+.search:focus-within { border-color: var(--accent); }
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 8px;
+}
+.ghost {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ghost:hover { border-color: var(--ink); }
+
+/* Index */
+.index { max-width: 1040px; margin: 0 auto; padding-block: 36px 16px; }
+.status { margin: 0 0 20px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); min-height: 1.7em; }
+.chapter { margin-top: 48px; }
+.chapter[hidden] { display: none; }
+.chapter-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 18px;
+  align-items: end;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: 18px;
+}
+.roman {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: lining-nums;
+}
+.chapter-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.chapter-head p { margin: 0; font-size: 13px; color: var(--muted); }
+.chapter-head .count { font-family: var(--font-mono); font-size: 12px; color: var(--muted); justify-self: end; align-self: start; }
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
+}
+.grid li { min-width: 0; display: flex; }
+.entry {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 14px;
+  align-content: start;
+  padding: 16px 18px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+.entry:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.entry:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.entry.picked {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.idx {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--accent);
+  padding-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  padding-right: 18px;
+}
+.desc {
+  grid-column: 2;
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.meta {
+  grid-column: 2;
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 0;
+}
+.host { overflow-wrap: anywhere; min-width: 0; }
+.caution {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.arrow {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+.entry:hover .arrow { color: var(--accent); transform: translate(2px, -2px); }
+
+.empty { padding: 48px 0; text-align: center; color: var(--muted); }
+.empty[hidden] { display: none; }
+
+footer {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-block: 40px 56px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+}
+
+@media (max-width: 560px) {
+  .stats div { padding-right: 18px; margin-right: 18px; }
+  .stats dd { font-size: 26px; }
+  .tools { max-width: none; flex-basis: 100%; }
+  .chapter-head { grid-template-columns: 1fr; }
+  .chapter-head .count { justify-self: start; }
+  .roman { font-size: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .entry, .arrow, .tab { transition: none; }
+  .entry:hover { transform: none; }
+}
+</style>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <p class="kicker">Githubsho intelligence presents</p>
+    <h1>allWebservice<span class="dot">.</span></h1>
+    <p class="lead">検索、翻訳、天気、ゲーム、便利ツールまで。作者がつくったWebの小さな実験を、ひとつの目録にまとめました。</p>
+    <dl class="stats">
+      <div><dt>サイト</dt><dd id="total">30</dd></div>
+      <div><dt>章</dt><dd>4</dd></div>
+      <div><dt>規約を確認</dt><dd id="cautionCount">2</dd></div>
+    </dl>
+    <div class="byline">
+      <span>作者：</span>
+      <a href="https://github.com/shointelligence" target="_blank" rel="noopener">GitHub @shointelligence ↗</a>
+    </div>
+  </div>
+</header>
+
+<nav class="toolbar" aria-label="絞り込み">
+  <div class="toolbar-inner">
+    <div class="tabs" role="group" aria-label="章で絞り込み" id="tabs"></div>
+    <div class="tools">
+      <label class="search">
+        <span class="sr">サイト名や説明で検索</span>
+        <input id="q" type="search" placeholder="サイト名・説明で検索" autocomplete="off">
+        <span class="kbd" aria-hidden="true">/</span>
+      </label>
+      <button class="ghost" id="pick" type="button">ランダムに選ぶ</button>
+    </div>
+  </div>
+</nav>
+
+<main class="index">
+  <p class="status" id="status" aria-live="polite"></p>
+  <div id="chapters"></div>
+  <p class="empty" id="empty" hidden>一致するサイトがありません。キーワードを変えるか、絞り込みをリセットしてください。</p>
+</main>
+
+<footer>
+  <span>各サイトの利用規約は、それぞれのページでご確認ください。</span>
+  <span>外部サイトは新しいタブで開きます。</span>
+</footer>
+
+<script>
+const chapters = [
+  { title: "おすすめ", note: "まず見てほしいサイト" },
+  { title: "国紹介", note: "国や地域の学習向けサイト" },
+  { title: "地味に便利なサイト", note: "ちょっとした作業に" },
+  { title: "ネタサイト集", note: "遊びや雑学のサイト" }
+];
+const roman = ["I", "II", "III", "IV"];
+
+const sites = [
+  { c: 0, name: "mySearch", url: "https://shinix.velvet.jp/search_fixed2.html", desc: "検索できるサイトです。検索ボタンを押すことでインターネットの世界につながります" },
+  { c: 0, name: "リアルタイム翻訳", url: "https://shinix.velvet.jp/voicebridge_consent_every_reload.html", desc: "リアルタイムで日本語から英語など様々な言語に翻訳されます", caution: true },
+  { c: 0, name: "よりみち掲示板", url: "https://shinix.velvet.jp/bbs/index.php", desc: "様々な人と匿名で交流することができるサイトです", caution: true },
+  { c: 0, name: "登録・ダウンロード不要！ブラウザでできる簡易的なFPSGame", url: "https://shinix.velvet.jp/FPS.html", desc: "エイム練習におすすめなFPSゲーム。登録もダウンロードも不要です" },
+  { c: 0, name: "天気", url: "https://tenkinow.vercel.app/", desc: "天気を見ることができるサイトです。お出かけ前にぜひ" },
+  { c: 0, name: "天気（旧モデル）", url: "https://shinix.velvet.jp/TENKI%E5%8F%96%E5%BE%97Now.html", desc: "旧モデルの天気サイトです。基本的な機能は変わりません" },
+  { c: 0, name: "Map", url: "https://shinix.velvet.jp/Map.html", desc: "現在地がどこなのかがわかるサイトです" },
+  { c: 0, name: "顔文字 (^^)/ VS", url: "https://shinix.velvet.jp/JUMPGame.html", desc: "顔文字のキャラクターが冒険をしてボスを倒すゲームです" },
+  { c: 0, name: "サブスク管理", url: "https://subscopeyes.netlify.app/", desc: "サブスクにかかっているお金を管理できるサイトです。月額・年額でどのくらい使っているかを見える化します" },
+  { c: 0, name: "OFFICE", url: "https://newoffice.netlify.app/", desc: "プレゼンテーションも文書作成もこれ一つ！登録不要・料金無料です" },
+  { c: 0, name: "code", url: "https://kodostudio.netlify.app/", desc: "初心者から上級者までコードを書くことができるサイトです。簡単なサイトから複雑なサイトまでこれ一つで" },
+  { c: 0, name: "無音カメラ", url: "https://cameranow.netlify.app/", desc: "法令に反する行為は禁止しています" },
+
+  { c: 1, name: "USSR", url: "https://shinix.velvet.jp/USSR.html#basic", desc: "旧ソビエト連邦を解説したサイトです。政治的意図はなく、学習目的で作成しています" },
+  { c: 1, name: "japan", url: "https://shinix.velvet.jp/japan.html", desc: "日本国の歴史・人口をまとめたサイトです" },
+
+  { c: 2, name: "言葉・数字変換サイト", url: "https://shinix.velvet.jp/%E6%96%87%E5%AD%97%E5%A4%89%E6%8F%9B%E3%82%B5%E3%82%A4%E3%83%88_html_20260904_cd2611.html", desc: "言葉を数字にしたり、数字を言葉にしたりできます" },
+  { c: 2, name: "電気代計算サイト", url: "https://shinix.velvet.jp/Denkidaikeisan_html_20260905_9c1e35.html", desc: "電気代を計算することができるサイトです" },
+  { c: 2, name: "QR", url: "https://shinix.velvet.jp/QR.html", desc: "リンクに対応したQRコードを作成できます。大きさや形式は多数用意" },
+  { c: 2, name: "ランダム", url: "https://shinix.velvet.jp/%E4%BD%9C%E6%88%90.html", desc: "ランダムな数字と英文字列を生成することができます" },
+  { c: 2, name: "動画編集ソフト", url: "https://shinix.velvet.jp/index.ht.html", desc: "ブラウザで動く動画編集ソフトです。登録もダウンロードも不要で利用できます" },
+  { c: 2, name: "便利サイト", url: "https://shinix.velvet.jp/%E4%BE%BF%E5%88%A9%E3%81%AA%E6%A9%9F%E8%83%BD%E8%A9%B0%E3%82%81%E8%BE%BC%E3%81%BF.html", desc: "便利なツールなどをまとめたサイトです" },
+  { c: 2, name: "電子工作", url: "https://shinix.velvet.jp/%E9%9B%BB%E5%AD%90%E5%B7%A5%E4%BD%9C%E5%9F%BA%E7%9B%A4%E3%83%86%E3%82%99%E3%83%A2%E3%80%80.html", desc: "電子工作のデモができます。正確性は保証できません" },
+
+  { c: 3, name: "静岡県紹介", url: "https://shinix.velvet.jp/Shizuoka.html", desc: "静岡県を紹介するサイトです" },
+  { c: 3, name: "歴代スマホ", url: "https://shinix.velvet.jp/%E6%AD%B4%E4%BB%A3%E3%82%B9%E3%83%9E%E3%83%9B.html", desc: "歴代のスマホをまとめたサイトです" },
+  { c: 3, name: "折り紙紹介", url: "https://shinix.velvet.jp/JaoabeseOrigami%20.html", desc: "秋の折り紙を紹介するサイトです" },
+  { c: 3, name: "cookie", url: "https://shinix.velvet.jp/%F0%9F%8D%AA.html", desc: "cookieを食べて食べて食べまくるサイトです" },
+  { c: 3, name: "Game", url: "https://shinix.velvet.jp/%E3%82%B1%E3%82%99%E3%83%BC%E3%83%A0.html", desc: "様々なゲームができます。友達と競ってみてください" },
+  { c: 3, name: "フィッシュアンドチップス", url: "https://shinix.velvet.jp/%E3%83%95%E3%82%A3%E3%83%83%E3%82%B7%E3%83%A5&%E3%83%81%E3%83%83%E3%83%95%E3%82%9A%E3%82%B9%E6%9C%AC%E6%A2%85%E3%82%A4%E3%82%AD%E3%82%99%E3%83%AA%E3%82%B9%E3%82%92%E5%86%8D%E7%8F%BE%EF%BC%81%E3%80%80.html", desc: "英国の伝統料理、フィッシュアンドチップスの作り方のサイトです" },
+  { c: 3, name: "mac紹介「非公式」", url: "https://shinix.velvet.jp/%E3%80%80.html#features", desc: "Macbookの詳細をまとめたサイトです（非公式）" },
+  { c: 3, name: "軽い", url: "https://shinix.velvet.jp/%E3%82%AB%E3%82%99%E3%83%81%E7%89%88%E4%B8%96%E7%95%8C%E4%B8%80%E8%BB%BD%E3%81%84%E3%82%B5%E3%82%A4%E3%83%88.html", desc: "世界一の軽さを狙っています" },
+  { c: 3, name: "顔文字AA", url: "https://shinix.velvet.jp/Kaomoji.html", desc: "ネットで話題になった顔文字をコピーできます" }
+];
+
+const state = { cat: -1, q: "" };
+const root = document.getElementById("chapters");
+const tabsEl = document.getElementById("tabs");
+const statusEl = document.getElementById("status");
+const emptyEl = document.getElementById("empty");
+const qEl = document.getElementById("q");
+const pickBtn = document.getElementById("pick");
+const entries = [];
+const chapterEls = [];
+const tabBtns = [];
+
+document.getElementById("total").textContent = String(sites.length);
+document.getElementById("cautionCount").textContent = String(sites.filter((s) => s.caution).length);
+
+function makeTab(label, count, value) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "tab";
+  b.dataset.value = String(value);
+  b.setAttribute("aria-pressed", value === -1 ? "true" : "false");
+  b.textContent = label;
+  const n = document.createElement("span");
+  n.className = "n";
+  n.textContent = String(count).padStart(2, "0");
+  b.appendChild(n);
+  b.addEventListener("click", () => {
+    state.cat = value;
+    render();
+  });
+  tabsEl.appendChild(b);
+  tabBtns.push(b);
+}
+
+makeTab("すべて", sites.length, -1);
+chapters.forEach((ch, i) => {
+  makeTab(ch.title, sites.filter((s) => s.c === i).length, i);
+});
+
+let index = 0;
+chapters.forEach((ch, ci) => {
+  const sec = document.createElement("section");
+  sec.className = "chapter";
+  const head = document.createElement("header");
+  head.className = "chapter-head";
+  const r = document.createElement("span");
+  r.className = "roman";
+  r.textContent = roman[ci];
+  const h = document.createElement("div");
+  const h2 = document.createElement("h2");
+  h2.textContent = ch.title;
+  const note = document.createElement("p");
+  note.textContent = ch.note;
+  h.append(h2, note);
+  const cnt = document.createElement("span");
+  cnt.className = "count";
+  head.append(r, h, cnt);
+  const ol = document.createElement("ol");
+  ol.className = "grid";
+
+  sites.forEach((site) => {
+    if (site.c !== ci) return;
+    index += 1;
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.className = "entry";
+    a.href = site.url;
+    a.target = "_blank";
+    a.rel = "noopener";
+
+    const idx = document.createElement("span");
+    idx.className = "idx";
+    idx.textContent = String(index).padStart(2, "0");
+
+    const title = document.createElement("h3");
+    title.className = "title";
+    title.textContent = site.name;
+
+    const desc = document.createElement("p");
+    desc.className = "desc";
+    desc.textContent = site.desc;
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const host = document.createElement("span");
+    host.className = "host";
+    try { host.textContent = new URL(site.url).hostname; } catch (e) { host.textContent = ""; }
+    meta.appendChild(host);
+    if (site.caution) {
+      const c = document.createElement("span");
+      c.className = "caution";
+      c.textContent = "利用規約を確認";
+      meta.appendChild(c);
+    }
+
+    const arrow = document.createElement("span");
+    arrow.className = "arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "↗";
+
+    a.append(idx, title, desc, meta, arrow);
+    li.appendChild(a);
+    ol.appendChild(li);
+    entries.push({ li, a, ch: ci, text: (site.name + " " + site.desc).toLowerCase(), name: site.name });
+  });
+
+  sec.append(head, ol);
+  root.appendChild(sec);
+  chapterEls.push({ sec, cnt, total: sites.filter((s) => s.c === ci).length });
+});
+
+function render() {
+  const q = state.q.trim().toLowerCase();
+  let shown = 0;
+  entries.forEach((e) => {
+    const ok = (state.cat === -1 || e.ch === state.cat) && (!q || e.text.includes(q));
+    e.li.hidden = !ok;
+    if (ok) shown += 1;
+  });
+  chapterEls.forEach((c, i) => {
+    const visible = c.sec.querySelectorAll("li:not([hidden])").length;
+    c.sec.hidden = visible === 0;
+    c.cnt.textContent = String(visible).padStart(2, "0") + " / " + String(c.total).padStart(2, "0");
+    c.sec.hidden = visible === 0;
+  });
+  tabBtns.forEach((b) => {
+    b.setAttribute("aria-pressed", String(Number(b.dataset.value) === state.cat));
+  });
+  emptyEl.hidden = shown !== 0;
+  statusEl.textContent = (state.q || state.cat !== -1)
+    ? shown + " 件 表示中（全 " + sites.length + " 件）"
+    : "全 " + sites.length + " 件を掲載しています";
+}
+
+qEl.addEventListener("input", () => {
+  state.q = qEl.value;
+  render();
+});
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "/" && document.activeElement !== qEl && !ev.metaKey && !ev.ctrlKey) {
+    ev.preventDefault();
+    qEl.focus();
+  }
+  if (ev.key === "Escape" && document.activeElement === qEl) {
+    qEl.value = "";
+    state.q = "";
+    render();
+  }
+});
+
+pickBtn.addEventListener("click", () => {
+  const visible = entries.filter((e) => !e.li.hidden);
+  entries.forEach((e) => e.a.classList.remove("picked"));
+  if (visible.length === 0) {
+    statusEl.textContent = "選べるサイトがありません。";
+    return;
+  }
+  const pick = visible[Math.floor(Math.random() * visible.length)];
+  pick.a.classList.add("picked");
+  pick.a.scrollIntoView({ behavior: "smooth", block: "center" });
+  pick.a.focus({ preventScroll: true });
+  statusEl.textContent = "「" + pick.name + "」を選びました。開くにはカードを押してください";
+});
+
+render();
+</script>
+
+</body></html>
